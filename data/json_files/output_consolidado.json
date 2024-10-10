@@ -1,0 +1,9 @@
+[
+    {"colaborador_id":11,"colaborador_nome":"Colaborador 4","Departamento":"Marketing","motivo_da_falta_":"Treinamento","horas_de_ausencia":6,"data_da_ausencia":"2023-08-04","salario":3200},
+    {"colaborador_id":12,"colaborador_nome":"Colaborador 5","Departamento":"Vendas","motivo_da_falta_":"Feriado","horas_de_ausencia":8,"data_da_ausencia":"2023-08-05","salario":2800},
+    {"colaborador_id":13,"colaborador_nome":"Colaborador 6","Departamento":"Logistica","motivo_da_falta_":"Doença","horas_de_ausencia":4,"data_da_ausencia":"2023-08-06","salario":3500},
+    {"colaborador_id":14,"colaborador_nome":"Colaborador 7","Departamento":"Produção","motivo_da_falta_":"Consulta Medica","horas_de_ausencia":2,"data_da_ausencia":"2023-08-07","salario":4000},
+    {"colaborador_id":15,"colaborador_nome":"Colaborador 1","Departamento":"RH","motivo_da_falta_":"Doença","horas_de_ausencia":4,"data_da_ausencia":"2023-08-01","salario":3000},
+    {"colaborador_id":16,"colaborador_nome":"Colaborador 2","Departamento":"Financeiro","motivo_da_falta_":"Consulta Médica","horas_de_ausencia":2,"data_da_ausencia":"2023-08-02","salario":4500},
+    {"colaborador_id":17,"colaborador_nome":"Colaborador 3","Departamento":"TI","motivo_da_falta_":"Férias","horas_de_ausencia":8,"data_da_ausencia":"2023-08-03","salario":5000}
+]

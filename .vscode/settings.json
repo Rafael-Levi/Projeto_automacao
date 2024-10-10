@@ -1,0 +1,6 @@
+{
+    "python.analysis.extraPaths": [
+        "./data_search/src/classes/ETL_source"
+    ],
+    "CodeGPT.apiKey": "CodeGPT Plus Beta"
+}

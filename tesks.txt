@@ -1,0 +1,16 @@
+API{
+    PRIORIDADE                                                                                                  STATUS  
+      Alta     ->     Fazer outra rota para popular a tabela                                                      OK
+      Baixa    ->     Fazer as funções que são chamadas no router.py em um arquivo separado (crud.py)              
+}
+
+data_pipeline{
+    
+      Média      ->  Criar um arquivo Columns para cada formato de arquivo (ColumnsCsv,ColumnsJson,ColumnsTxt) Em andamento
+      Alta       ->  Otimizar a função combine_columns() alterando a função check_for_new_files()                 OK
+}
+
+api_intagrations{
+      Média      -> Passar o codigo para classes Poo e fazer um controller para cada formato                  Em andamento
+      
+}

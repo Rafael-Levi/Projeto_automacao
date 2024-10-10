@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "projeto-automação"
+version = "0.1.0"
+description = ""
+authors = ["Rafael <rafaellevicodur2@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = {extras = ["standard"], version = "^0.112.2"}
+email-validator = "^2.2.0"
+schedule = "^1.2.2"
+boto3 = "^1.35.12"
+setuptools = "^74.1.2"
+requests = "^2.32.3"
+sqlalchemy = "^2.0.35"
+pandas = "^2.2.3"
+logger = "^1.4"
+taskipy = "^1.13.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.taskipy.tasks]
+api = "cd API && uvicorn start:app --reload"
+run = "python main.py"
