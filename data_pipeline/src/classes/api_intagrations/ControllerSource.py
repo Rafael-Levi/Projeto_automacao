@@ -54,3 +54,26 @@ class APIClient(Columns):
 
         except Exception as e:
             print(f"An error occurred: {e}")
+    def get_table_data(self,table_name:str):
+        response = requests.get(f"http://127.0.0.1:8000/get_table_data/{table_name}")
+        return response.json()
+    
+    def delete_item(self,item_name):
+        response = requests.delete(f"http://127.0.0.1:8000/delete{item_name}")
+        return response
+    
+    def update_table_value(self,table_name):
+        column_name = str(input("Nome da coluna: "))
+        new_value = str(input("Dado que deseja substituir: "))
+        condition = str(input("Condição da query (ex: colaborador_id = 1)"))
+        payload = {
+            "column_name": column_name,
+            "new_value" : new_value,
+            "condition": condition
+        }
+        response = requests.put(f"http://127.0.0.1:8000/{table_name}", data = json.dumps(payload) )
+        if response.status_code == 200:
+            print("Coluna atualizada com sucesso!")
+            print("Resposta:", response.json())
+        else:
+            print(f"Falha ao atualizar a coluna. Erro {response.status_code}: {response.text}")

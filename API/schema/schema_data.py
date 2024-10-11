@@ -9,5 +9,7 @@ class PopulateTable(BaseModel):
         from_attributes = True
 
 class ResponseModel(BaseModel):
+    msg:str
     table_name:Optional[str]
     count:Optional[int]
+    item_name:Optional[str]

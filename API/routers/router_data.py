@@ -1,11 +1,13 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import Table, MetaData
+from sqlalchemy import Table, MetaData,select,update,text
+import models.models_metadata
 import schema.schema_data
 import schema.schema_metadata
 import logger,logging,models.model_data,schema
 from database import get_data_db
 from sqlalchemy.exc import SQLAlchemyError
+from database import data_engine
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
 router_data = APIRouter()
@@ -50,3 +52,85 @@ async def populate_table(schema_tables: schema.schema_data.PopulateTable, db: Se
         db.rollback()
         logger.error(f"Erro geral: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
+@router_data.get("/get_table_data/{table_name}", response_model=None)
+async def get_table_data(table_name:str, db: Session = Depends(get_data_db)):
+    try:
+        # Criar MetaData sem o argumento 'bind'
+        metadata = MetaData()
+
+        logger.info(f"Refletindo o banco de dados para buscar a tabela {table_name}...")
+        # Refletir o banco de dados com o db.bind (essa é a conexão)
+        metadata.reflect(bind=db.bind)
+
+        # Verificar se a tabela existe no banco de dados
+        if table_name not in metadata.tables:
+            logger.error(f"Tabela '{table_name}' não encontrada no banco de dados.")
+            raise HTTPException(status_code=404, detail=f"Tabela '{table_name}' não encontrada.")
+
+        # Obter a tabela
+        table = metadata.tables.get(table_name)
+        logger.info(f"Tabela {table_name} encontrada com sucesso!")
+
+        # Executar o SELECT * na tabela
+        query = select(table)
+        logger.info(f"Executando query: SELECT * FROM {table_name}")
+        result = db.execute(query).fetchall()
+
+        # Converter o resultado para uma lista de dicionários
+        if result:
+            columns = table.columns.keys()
+            rows = [dict(zip(columns, row)) for row in result]
+            return rows
+        else:
+            return []
+
+    except SQLAlchemyError as e:
+        logger.error(f"Erro de SQLAlchemy: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erro no banco de dados: {str(e)}")
+
+    except Exception as e:
+        logger.error(f"Erro geral: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erro ao buscar dados da tabela: {str(e)}")
+
+@router_data.delete("delete/{item_name}",response_model = schema.schema_data.ResponseModel)
+async def delete_item(item_name: str, db: Session = Depends(get_data_db)):
+    db_item = db.query(models.models_metadata.Column).filter_by()
+    if db_item is None:
+        raise HTTPException(status_code=404, detail="Item not found")
+    db.delete(db_item)
+    db.flush()
+    db.commit()
+    return f"{item_name} deletado com sucesso!"
+
+from sqlalchemy import update
+from fastapi import HTTPException
+
+@router_data.put("/update_table_column/")
+async def update_table_column(table_name: str, column_name: str, new_value: str, condition: str, db: Session = Depends(get_data_db)):
+    try:
+        # Reflete a tabela do banco de dados
+        metadata = MetaData()
+        table = Table(table_name, metadata, autoload_with=db.bind)
+
+        # Monta a query de update
+        stmt = (
+            update(table)
+            .where(text(condition))  # Condição passada, como "id = 1"
+            .values({column_name: new_value})
+        )
+
+        # Executa a query de update
+        result = db.execute(stmt)
+        db.commit()
+
+        if result.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Nenhum registro encontrado para atualizar.")
+        
+        return {"message": "Coluna atualizada com sucesso.", "rows_updated": result.rowcount}
+
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Erro no banco de dados: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro: {str(e)}")
