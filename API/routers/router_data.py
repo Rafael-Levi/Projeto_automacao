@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import Table, MetaData,select,update,text
+from sqlalchemy import Table, MetaData,select,update,text,insert
 import models.models_metadata
 import schema.schema_data
 import schema.schema_metadata
@@ -21,7 +21,6 @@ async def create_table(table_schema: schema.schema_metadata.TableSchema):
 @router_data.post("/populate_table/{table_name}",response_model=schema.schema_data.ResponseModel)
 async def populate_table(schema_tables: schema.schema_data.PopulateTable, db: Session = Depends(get_data_db)):
     try:
-        # Refletir a tabela do banco de dados
         metadata = MetaData()
         table = Table(schema_tables.table_name, metadata, autoload_with=db.bind) 
 
@@ -31,7 +30,6 @@ async def populate_table(schema_tables: schema.schema_data.PopulateTable, db: Se
                 if column.name not in entry:
                     raise HTTPException(status_code=400, detail=f"Missing column '{column.name}' in entry {entry}.")
 
-        # Inserir dados
         logger.info(f"Inserindo dados na tabela {schema_tables.table_name}: {schema_tables.data}")
         result = db.execute(table.insert(), schema_tables.data)
         
@@ -56,28 +54,22 @@ async def populate_table(schema_tables: schema.schema_data.PopulateTable, db: Se
 @router_data.get("/get_table_data/{table_name}", response_model=None)
 async def get_table_data(table_name:str, db: Session = Depends(get_data_db)):
     try:
-        # Criar MetaData sem o argumento 'bind'
         metadata = MetaData()
 
         logger.info(f"Refletindo o banco de dados para buscar a tabela {table_name}...")
-        # Refletir o banco de dados com o db.bind (essa é a conexão)
         metadata.reflect(bind=db.bind)
 
-        # Verificar se a tabela existe no banco de dados
         if table_name not in metadata.tables:
             logger.error(f"Tabela '{table_name}' não encontrada no banco de dados.")
             raise HTTPException(status_code=404, detail=f"Tabela '{table_name}' não encontrada.")
 
-        # Obter a tabela
         table = metadata.tables.get(table_name)
         logger.info(f"Tabela {table_name} encontrada com sucesso!")
 
-        # Executar o SELECT * na tabela
         query = select(table)
         logger.info(f"Executando query: SELECT * FROM {table_name}")
         result = db.execute(query).fetchall()
 
-        # Converter o resultado para uma lista de dicionários
         if result:
             columns = table.columns.keys()
             rows = [dict(zip(columns, row)) for row in result]
@@ -93,21 +85,37 @@ async def get_table_data(table_name:str, db: Session = Depends(get_data_db)):
         logger.error(f"Erro geral: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Erro ao buscar dados da tabela: {str(e)}")
 
-@router_data.delete("delete/{item_name}",response_model = schema.schema_data.ResponseModel)
-async def delete_item(item_name: str, db: Session = Depends(get_data_db)):
-    db_item = db.query(models.models_metadata.Column).filter_by()
-    if db_item is None:
-        raise HTTPException(status_code=404, detail="Item not found")
-    db.delete(db_item)
-    db.flush()
-    db.commit()
-    return f"{item_name} deletado com sucesso!"
+@router_data.delete("/delete_register/")
+async def delete_register_router(schema_delete: schema.schema_data.DeleteItem, db: Session = Depends(get_data_db)):
+    try:
+        # Refletir a tabela existente no banco de dados
+        metadata = MetaData()
+        table = Table(schema_delete.table_name, metadata, autoload_with=db.bind)
+        
+        # Montar a query de delete com base na condição
+        delete_query = table.delete().where(text(schema_delete.condition))
+        
+        # Executar a query
+        result = db.execute(delete_query)
+        db.commit()
 
-@router_data.put("/update_table_column/{table_name}")
-async def update_table_column(table_name: str,schema_data: schema.schema_data.UpdateRequest, db: Session = Depends(get_data_db)):
+        # Verificar quantas linhas foram afetadas
+        rows_deleted = result.rowcount
+
+        if rows_deleted == 0:
+            return {"message": "Nenhuma linha foi deletada."}
+        
+        return {"message": "Linhas deletadas com sucesso.", "rows_deleted": rows_deleted}
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Erro ao deletar dados da tabela: {str(e)}")
+
+@router_data.put("/update_table_column/")
+async def update_table_column(schema_data: schema.schema_data.UpdateRequest, db: Session = Depends(get_data_db)):
     try:
         metadata = MetaData()
-        table = Table(table_name, metadata, autoload_with=db.bind)
+        table = Table(schema_data.table_name, metadata, autoload_with=db.bind)
 
         stmt = (
             update(table)
@@ -128,3 +136,26 @@ async def update_table_column(table_name: str,schema_data: schema.schema_data.Up
         raise HTTPException(status_code=500, detail=f"Erro no banco de dados: {str(e)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro: {str(e)}")
+
+@router_data.post("/insert_data")
+async def insert_data(schema_insert: schema.schema_data.InsertData, db: Session = Depends(get_data_db)):
+    try:
+        # Refletir a tabela do banco de dados
+        metadata = MetaData()
+        table = Table(schema_insert.table_name, metadata, autoload_with=db.bind)
+        
+        # Realizar a inserção
+        insert_stmt = insert(table).values(schema_insert.data)
+        result = db.execute(insert_stmt)
+        
+        db.commit()
+
+        return {"message": "Dados inseridos com sucesso", "rowcount": result.rowcount}
+
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Erro no banco de dados: {str(e)}")
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Erro inesperado: {str(e)}")

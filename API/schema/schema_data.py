@@ -15,6 +15,15 @@ class ResponseModel(BaseModel):
     item_name:Optional[str]
 
 class UpdateRequest(BaseModel):
+    table_name:str
     column_name: str
-    new_value: str
+    new_value: str|int|float
     condition: str
+
+class DeleteItem(BaseModel):
+    table_name:str
+    condition:str
+
+class InsertData(BaseModel):
+    table_name:str
+    data:List[Dict[str,int|str|float]]
