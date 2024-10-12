@@ -62,18 +62,17 @@ class APIClient(Columns):
         response = requests.delete(f"http://127.0.0.1:8000/delete{item_name}")
         return response
     
-    def update_table_value(self,table_name):
-        column_name = str(input("Nome da coluna: "))
-        new_value = str(input("Dado que deseja substituir: "))
-        condition = str(input("Condição da query (ex: colaborador_id = 1)"))
-        payload = {
+    def update_column(table_name: str, column_name: str, new_value: str, condition: str):
+        url = f"http://127.0.0.1:8000/update_table_column/{table_name}"
+        data = {
             "column_name": column_name,
-            "new_value" : new_value,
+            "new_value": new_value,
             "condition": condition
         }
-        response = requests.put(f"http://127.0.0.1:8000/{table_name}", data = json.dumps(payload) )
+
+        response = requests.put(url, json=data)
+
         if response.status_code == 200:
-            print("Coluna atualizada com sucesso!")
-            print("Resposta:", response.json())
+            print("Coluna atualizada com sucesso.")
         else:
-            print(f"Falha ao atualizar a coluna. Erro {response.status_code}: {response.text}")
+            print(f"Falha ao atualizar a coluna. Erro {response.status_code}: {response.json()}")

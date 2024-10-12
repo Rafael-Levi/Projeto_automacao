@@ -103,31 +103,25 @@ async def delete_item(item_name: str, db: Session = Depends(get_data_db)):
     db.commit()
     return f"{item_name} deletado com sucesso!"
 
-from sqlalchemy import update
-from fastapi import HTTPException
-
-@router_data.put("/update_table_column/")
-async def update_table_column(table_name: str, column_name: str, new_value: str, condition: str, db: Session = Depends(get_data_db)):
+@router_data.put("/update_table_column/{table_name}")
+async def update_table_column(table_name: str,schema_data: schema.schema_data.UpdateRequest, db: Session = Depends(get_data_db)):
     try:
-        # Reflete a tabela do banco de dados
         metadata = MetaData()
         table = Table(table_name, metadata, autoload_with=db.bind)
 
-        # Monta a query de update
         stmt = (
             update(table)
-            .where(text(condition))  # Condição passada, como "id = 1"
-            .values({column_name: new_value})
+            .where(text(schema_data.condition))  
+            .values({schema_data.column_name: schema_data.new_value})
         )
 
-        # Executa a query de update
         result = db.execute(stmt)
         db.commit()
 
         if result.rowcount == 0:
             raise HTTPException(status_code=404, detail="Nenhum registro encontrado para atualizar.")
         
-        return {"message": "Coluna atualizada com sucesso.", "rows_updated": result.rowcount}
+        return {"msg": "Coluna atualizada com sucesso.", "rows_updated": result.rowcount}
 
     except SQLAlchemyError as e:
         db.rollback()

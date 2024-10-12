@@ -1,5 +1,5 @@
 # Justificativa do projeto
- - Diante da necessidade do dia a dia de manipular grande quantidade de arquivos e de diferentes formatos (CSV,JSON,TXT...) surgiu a ideia de automatizar o processo usando
+ - Diante da necessidade do dia a dia na empresa de manipular grande quantidade de arquivos e de diferentes formatos (CSV,JSON,TXT...) surgiu a ideia de automatizar o processo usando
    Poo e Bibliotecas python ( fastapi,pandas,sqlalchemy, etc).
    - Construi então um sistema de busca de arquivos que detecta todos os arquivos presentes na pasta *data* e concatena tudo na pasta *data_frames*.
    - Com os dados concatenados eu coleto todas as colunas do arquivo e o tipo de dados de cada uma e mando para um banco de dados que serve para armazenar as informações básicas de cada tabela que sera gerada.

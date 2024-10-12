@@ -13,3 +13,8 @@ class ResponseModel(BaseModel):
     table_name:Optional[str]
     count:Optional[int]
     item_name:Optional[str]
+
+class UpdateRequest(BaseModel):
+    column_name: str
+    new_value: str
+    condition: str
