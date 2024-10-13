@@ -25,7 +25,7 @@ while True:
         [3] SAIR
     ''')
     start_input = int(input('Resposta: '))
-    table_name_input = str(input("Nome da tabela que será criada: "))
+    table_name_input = str(input("Nome da tabela que será manipulada: "))
     try:
         if start_input == 1:
             output = outputcsv.check_and_transforme_csv() #Busca arquivos e armazena em csv
