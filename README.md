@@ -4,7 +4,9 @@
    - Construi então um sistema de busca de arquivos que detecta todos os arquivos presentes na pasta *data* e concatena tudo na pasta *data_frames*.
    - Com os dados concatenados eu coleto todas as colunas do arquivo e o tipo de dados de cada uma e mando para um banco de dados que serve para armazenar as informações básicas de cada tabela que sera gerada.
    - Por fim crio um banco de dados com as respectivas colunas e tipos e apartir dai o usuário consegue manipular todos os dados (fazer operações CRUD) de maneira fácil e rápida.
-
+## OBS
+   Disponibilizei um teste prático na branch `teste` 
+   - Os dados `customers` e `orders` são adicionados de forma separada a fim de constrir duas tabelas conforme demostrado.
 
 ```graphql
 projeto_automacao/
