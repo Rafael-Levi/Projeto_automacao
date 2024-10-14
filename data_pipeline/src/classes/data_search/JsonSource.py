@@ -27,15 +27,20 @@ class JsonSource(FilesSources):
         for file_path in self.previous_files:
             try:
                 path = f'{self.folder_path}/{file_path}'
-                data = pd.read_json(path)
+                with open(path, 'r') as file:
+                    data = pd.read_json(path)
+                    
+                    # Verificar se o JSON contém valores escalares
+                    if isinstance(data, dict):
+                        # Converter o dicionário em DataFrame com uma linha
+                        data_frame.append(pd.DataFrame([data]))
+                    else:
+                        # Assumir que o JSON tem estrutura correta
+                        data_frame.append(data)
 
-                # Flatten nested JSON structure if necessary
-                if isinstance(data, list):
-                    data = pd.json_normalize(data)
-                
-                data_frame.append(data)
             except Exception as e:
-                print("An error occurred while reading the JSON file:", e)
+                print(f"An error occurred while reading the JSON file: {e}")
+        
         if data_frame:
             self.combined_data = pd.concat(data_frame, ignore_index=True)
             return self.combined_data

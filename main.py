@@ -17,15 +17,17 @@ controller = APIClient()
 
 while True: 
     print('''
-        Antes de começar a busca por arquivos
-        em qual formato você prefere o data frame?
+        Escolha um formato de saida para o data frame:
+        Obs:Se deseja criar outra tabela no banco:
+        -Apague os arquivos adcionados e insira novos arquivos para a outra tabela
+        -Escolha um nome para a nova tabela no banco
         
         [1] CSV
         [2] JSON
         [3] SAIR
     ''')
     start_input = int(input('Resposta: '))
-    table_name_input = str(input("Nome da tabela que será criada: "))
+    table_name_input = str(input("Nome da tabela que será manipulada: "))
     try:
         if start_input == 1:
             output = outputcsv.check_and_transforme_csv() #Busca arquivos e armazena em csv
