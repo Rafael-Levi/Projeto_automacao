@@ -7,7 +7,6 @@ import schema.schema_metadata
 import logger,logging,models.model_data,schema
 from database import get_data_db
 from sqlalchemy.exc import SQLAlchemyError
-from database import data_engine
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
 router_data = APIRouter()
