@@ -27,3 +27,4 @@ build-backend = "poetry.core.masonry.api"
 [tool.taskipy.tasks]
 api = "cd API && uvicorn start:app --reload"
 run = "python main.py"
+query = "python analytics.py"

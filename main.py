@@ -83,3 +83,6 @@ while True:
             break
         else:
             print("Resposta inválida, tente novamente!")
+
+def hello():
+    print("oi")
