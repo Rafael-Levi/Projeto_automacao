@@ -1,7 +1,7 @@
 # Como rodar o projeto
 
 ```bash
-git clone github.com/Rafael-Levi/projeto_automacao
+git clone https://github.com/Rafael-Levi/Projeto_automacao.git
 ```
 ```bash
 pip install poetry
