@@ -4,6 +4,9 @@
 git clone https://github.com/Rafael-Levi/Projeto_automacao.git
 ```
 ```bash
+git checkout teste
+```
+```bash
 pip install poetry
 ```
 ```bash
